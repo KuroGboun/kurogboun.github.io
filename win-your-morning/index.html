@@ -269,17 +269,18 @@
   }
 
   // Returning visitor who already joined on this device — restore email + count.
+  // saved.n is only an instant placeholder; the live fetch below refreshes it.
   var saved = null;
   try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) {}
   var alreadyJoined = !!(saved && saved.email);
   if (alreadyJoined) renderJoined(saved.email, saved.n);
 
-  // Live count — silently leaves the static "68" fallback if it fails.
-  if (!alreadyJoined) {
-    fetch(API).then(function (r) { return r.json(); }).then(function (d) {
-      if (d && d.ok && typeof d.count === 'number') counter.textContent = counterText(d.count);
-    }).catch(function () {});
-  }
+  // Live count — ALWAYS refresh from the server so the number is current, even
+  // for visitors who already joined (otherwise it freezes at their join-time
+  // value). Silently leaves the static "68"/saved fallback if the request fails.
+  fetch(API).then(function (r) { return r.json(); }).then(function (d) {
+    if (d && d.ok && typeof d.count === 'number') counter.textContent = counterText(d.count);
+  }).catch(function () {});
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
