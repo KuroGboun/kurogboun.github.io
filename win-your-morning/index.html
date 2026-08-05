@@ -131,8 +131,12 @@
   .hp{position:absolute; left:-9999px; width:1px; height:1px; opacity:0; overflow:hidden}
   .msg{min-height:16px; font-family:-apple-system,system-ui,sans-serif; font-size:14px;
        color:var(--cream); margin-top:12px; max-width:560px}
+  /* Hidden until the live count arrives, then fades in ONCE (via .ready) — so the
+     number never visibly jumps from a stale placeholder to the real total. */
   .counter{font-family:var(--font-secondary); font-size:13px; font-weight:600; letter-spacing:.01em;
-           color:rgba(244,236,216,.9); text-shadow:0 1px 10px rgba(20,40,70,.35); margin-top:14px}
+           color:rgba(244,236,216,.9); text-shadow:0 1px 10px rgba(20,40,70,.35); margin-top:14px;
+           opacity:0; transition:opacity .3s ease}
+  .counter.ready{opacity:1}
 
   /* ── Tablet ───────────────────────────────────────────────────────── */
   @media (max-width:1024px){
@@ -268,19 +272,25 @@
     msg.textContent = '';
   }
 
-  // Returning visitor who already joined on this device — restore email + count.
-  // saved.n is only an instant placeholder; the live fetch below refreshes it.
+  function revealCounter() { counter.classList.add('ready'); }
+
+  // Returning visitor who already joined on this device — restore email + button.
+  // saved.n pre-fills the counter's fallback text but stays HIDDEN; the live
+  // fetch below is what actually reveals the number.
   var saved = null;
   try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) {}
   var alreadyJoined = !!(saved && saved.email);
   if (alreadyJoined) renderJoined(saved.email, saved.n);
 
-  // Live count — ALWAYS refresh from the server so the number is current, even
-  // for visitors who already joined (otherwise it freezes at their join-time
-  // value). Silently leaves the static "68"/saved fallback if the request fails.
+  // Fetch the live count, THEN reveal the counter once with the real number, so
+  // it never visibly jumps from a stale placeholder. On failure we still reveal
+  // (falling back to the saved/seed text); the timeout guarantees it appears
+  // even if the network hangs.
   fetch(API).then(function (r) { return r.json(); }).then(function (d) {
     if (d && d.ok && typeof d.count === 'number') counter.textContent = counterText(d.count);
-  }).catch(function () {});
+    revealCounter();
+  }).catch(revealCounter);
+  setTimeout(revealCounter, 2500);
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
@@ -300,6 +310,7 @@
       if (d && d.ok && d.joined) {
         try { localStorage.setItem(KEY, JSON.stringify({ email: email, n: d.count })); } catch (e2) {}
         renderJoined(email, d.count);
+        revealCounter();
       } else {
         btn.disabled = false;
         btn.textContent = restore;
