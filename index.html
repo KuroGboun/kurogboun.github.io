@@ -59,12 +59,20 @@
   .c2{right:-80px; top:300px; width:560px; height:300px; background:rgba(255,255,255,.36); filter:blur(46px)}
   .c3{left:18%; bottom:40px; width:62%; height:320px; background:rgba(255,255,255,.5); filter:blur(56px)}
 
-  /* Floaters — draggable emoji. Size carried in --s so media queries can scale
-     the whole cluster with one calc(); positions are % of the hero. */
+  /* The emoji live in a band. On desktop it fills the frame and they scatter to
+     the right of the copy; the phone media query turns it into a flow strip
+     between the caption and the form (board: mobile version). */
+  .floatband{position:absolute; inset:0; z-index:2; pointer-events:none}
   .float{position:absolute; width:var(--s); height:var(--s); cursor:grab; touch-action:none;
-         filter:drop-shadow(0 16px 22px rgba(20,40,70,.26)); z-index:2}
+         pointer-events:auto; filter:drop-shadow(0 16px 22px rgba(20,40,70,.26))}
   .float img{width:100%; height:100%; object-fit:contain; display:block;
              pointer-events:none; -webkit-user-drag:none; user-select:none; -webkit-touch-callout:none}
+  /* Desktop scatter positions — off inline styles so the phone query can win. */
+  #f1{--s:92px;  left:55.6%; top:12.4%}  #f2{--s:114px; left:74.8%; top:10.5%}
+  #f3{--s:88px;  left:90.9%; top:22.6%}  #f4{--s:106px; left:61.4%; top:28.1%}
+  #f5{--s:124px; left:79.2%; top:29.1%}  #f6{--s:94px;  left:53.9%; top:45.3%}
+  #f7{--s:84px;  left:69.3%; top:50.1%}  #f8{--s:100px; left:88.7%; top:48.4%}
+  #f10{--s:118px; left:56.6%; top:64.5%} #f13{--s:102px; left:79.4%; top:65.1%}
   @keyframes bobA{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-18px) rotate(-2deg)}}
   @keyframes bobB{0%,100%{transform:translateY(0) rotate(7deg)}50%{transform:translateY(-24px) rotate(2deg)}}
   @keyframes bobC{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-13px) rotate(4deg)}}
@@ -83,7 +91,10 @@
   .nav-cta:active{transform:translateY(0)}
 
   /* ── Hero content ─────────────────────────────────────────────────── */
-  .content{position:relative; z-index:3; padding:66px 72px 40px; max-width:820px}
+  .content{position:relative; z-index:3; padding:66px 72px 0; max-width:820px}
+  /* The form block — its own element (not inside .content) so the phone band
+     can slot between the caption and it. On desktop it sits under the copy. */
+  .signup{position:relative; z-index:3; max-width:560px; padding:0 72px 40px}
   .kicker{display:inline-block; transform:rotate(-4deg); background:var(--terra); color:var(--cream);
           font-size:11px; font-weight:800; letter-spacing:.14em; padding:7px 12px; border-radius:8px}
   h1{margin:26px 0 0; font-family:var(--font-primary); font-size:clamp(52px,13vw,150px); font-weight:800;
@@ -134,28 +145,35 @@
     form{margin-top:24px}
   }
 
-  /* ── Phone ────────────────────────────────────────────────────────── */
+  /* ── Phone (board: mobile) — a clean vertical stack: nav → copy → emoji
+        band → form. The emoji sit in their own strip, not behind the text. ── */
   @media (max-width:640px){
-    .nav{padding:18px 20px}
-    .nav-cta{font-size:13px; padding:10px 16px}
-    /* Keep the top-cluster five, hide the ones that would sit over the copy. */
-    #f6,#f7,#f8,#f10,#f13{display:none}
-    .float{width:calc(var(--s)*.52); height:calc(var(--s)*.52)}
-    #f1{left:4%;  top:15%}
-    #f4{left:31%; top:9%}
-    #f2{left:66%; top:11%}
-    #f5{left:50%; top:25%}
-    #f3{left:82%; top:22%}
-    /* Push the copy below the floater band, full width. */
-    .content{padding:38% 20px 48px; max-width:none}
-    h1{letter-spacing:-.04em}
-    .caption{margin-top:22px}
-    form{flex-direction:column; align-items:stretch; gap:12px}
-    .email,.join{width:100%; text-align:center}
+    .nav{padding:18px 24px}
+    .nav-cta{font-size:13px; padding:11px 18px}
+    .content{padding:30px 24px 0; max-width:none}
+    h1{font-size:clamp(50px,16.5vw,66px); line-height:.84; letter-spacing:-.04em}
+    .caption{margin-top:18px; font-size:17px; line-height:1.45}
+
+    /* Band becomes a flow strip between caption and form; the 8 emoji the board
+       uses sit at its own coordinates (left %, top px within the strip). */
+    .floatband{position:relative; inset:auto; height:212px; margin-top:6px}
+    .float{filter:drop-shadow(0 12px 18px rgba(20,40,70,.24))}
+    #f7,#f13{display:none}
+    #f1 {left:5%;  top:26px;  width:70px; height:70px}
+    #f3 {left:28%; top:2px;   width:62px; height:62px}
+    #f2 {left:47%; top:24px;  width:82px; height:82px}
+    #f8 {left:75%; top:0;     width:66px; height:66px}
+    #f4 {left:76%; top:96px;  width:72px; height:72px}
+    #f6 {left:2%;  top:120px; width:64px; height:64px}
+    #f5 {left:24%; top:108px; width:86px; height:86px}
+    #f10{left:53%; top:126px; width:72px; height:72px}
+
+    .signup{max-width:none; padding:0 24px 20px}
+    form{flex-direction:column; align-items:stretch; gap:10px; margin-top:0}
+    .email,.signed,.join{width:100%; text-align:center}
+    .signed{justify-content:center}
     .join{padding:18px 24px}
-  }
-  @media (max-width:380px){
-    .content{padding:44% 18px 40px}
+    .counter{text-align:center; margin-top:10px}
   }
 </style>
 </head>
@@ -168,18 +186,6 @@
     <div class="cloud c3"></div>
 
     <div class="frame">
-    <!-- Floating draggable emoji -->
-    <div class="float bobA" id="f1"  data-float="obj1"  style="--s:92px;  left:55.6%; top:12.4%"><img src="assets/emoji-obj1.png"  alt=""></div>
-    <div class="float bobC" id="f2"  data-float="obj2"  style="--s:114px; left:74.8%; top:10.5%"><img src="assets/emoji-obj2.png"  alt=""></div>
-    <div class="float bobB" id="f3"  data-float="obj3"  style="--s:88px;  left:90.9%; top:22.6%"><img src="assets/emoji-obj3.png"  alt=""></div>
-    <div class="float bobB" id="f4"  data-float="obj4"  style="--s:106px; left:61.4%; top:28.1%"><img src="assets/emoji-obj4.png"  alt=""></div>
-    <div class="float bobA" id="f5"  data-float="obj5"  style="--s:124px; left:79.2%; top:29.1%"><img src="assets/emoji-obj5.png"  alt=""></div>
-    <div class="float bobC" id="f6"  data-float="obj6"  style="--s:94px;  left:53.9%; top:45.3%"><img src="assets/emoji-obj6.png"  alt=""></div>
-    <div class="float bobC" id="f7"  data-float="obj7"  style="--s:84px;  left:69.3%; top:50.1%"><img src="assets/emoji-obj7.png"  alt=""></div>
-    <div class="float bobA" id="f8"  data-float="obj8"  style="--s:100px; left:88.7%; top:48.4%"><img src="assets/emoji-obj8.png"  alt=""></div>
-    <div class="float bobB" id="f10" data-float="obj10" style="--s:118px; left:56.6%; top:64.5%"><img src="assets/emoji-obj10.png" alt=""></div>
-    <div class="float bobC" id="f13" data-float="obj13" style="--s:102px; left:79.4%; top:65.1%"><img src="assets/emoji-obj13.png" alt=""></div>
-
     <!-- Nav -->
     <div class="nav">
       <div class="brand">
@@ -195,7 +201,24 @@
       <h1>Win your<br>morning</h1>
       <svg class="squiggle" width="420" height="24" viewBox="0 0 420 24" fill="none" stroke="#E0A032" stroke-width="7" stroke-linecap="round" aria-hidden="true"><path d="M6 15 Q 42 5 78 13 T 150 13 T 222 13 T 294 13 T 366 12 T 414 11"></path></svg>
       <p class="caption">Your friends are the alarm clock. Make your promises the night before, prove it with a photo by the deadline, or wake up as Bum of the Day.</p>
+    </div>
 
+    <!-- Emoji — a scattered cluster on desktop, a neat band between the caption
+         and the form on phones (board: mobile). Draggable either way. -->
+    <div class="floatband">
+      <div class="float bobA" id="f1"  data-float="obj1"><img src="assets/emoji-obj1.png"  alt=""></div>
+      <div class="float bobC" id="f2"  data-float="obj2"><img src="assets/emoji-obj2.png"  alt=""></div>
+      <div class="float bobB" id="f3"  data-float="obj3"><img src="assets/emoji-obj3.png"  alt=""></div>
+      <div class="float bobB" id="f4"  data-float="obj4"><img src="assets/emoji-obj4.png"  alt=""></div>
+      <div class="float bobA" id="f5"  data-float="obj5"><img src="assets/emoji-obj5.png"  alt=""></div>
+      <div class="float bobC" id="f6"  data-float="obj6"><img src="assets/emoji-obj6.png"  alt=""></div>
+      <div class="float bobC" id="f7"  data-float="obj7"><img src="assets/emoji-obj7.png"  alt=""></div>
+      <div class="float bobA" id="f8"  data-float="obj8"><img src="assets/emoji-obj8.png"  alt=""></div>
+      <div class="float bobB" id="f10" data-float="obj10"><img src="assets/emoji-obj10.png" alt=""></div>
+      <div class="float bobC" id="f13" data-float="obj13"><img src="assets/emoji-obj13.png" alt=""></div>
+    </div>
+
+    <div class="signup">
       <form id="get" novalidate>
         <input class="email" id="email" type="email" inputmode="email" autocomplete="email" placeholder="Your email" aria-label="Your email" />
         <input class="hp" id="website" name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
