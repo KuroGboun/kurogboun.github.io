@@ -253,6 +253,7 @@
   var counter = document.getElementById('counter');
   var signed = document.getElementById('signedEmail');
   var msg = document.getElementById('formMsg');
+  var src = new URLSearchParams(location.search).get('src'); // ?src= channel tag (reddit, ig, …)
 
   function counterText(n) { return n + ' people ready to win their mornings'; }
 
@@ -286,7 +287,10 @@
   // it never visibly jumps from a stale placeholder. On failure we still reveal
   // (falling back to the saved/seed text); the timeout guarantees it appears
   // even if the network hangs.
-  fetch(API).then(function (r) { return r.json(); }).then(function (d) {
+  // no-store so every real load reaches the function (which logs the view);
+  // src rides along as ?src= so views can be split by channel.
+  fetch(API + (src ? '?src=' + encodeURIComponent(src) : ''), { cache: 'no-store' })
+    .then(function (r) { return r.json(); }).then(function (d) {
     if (d && d.ok && typeof d.count === 'number') counter.textContent = counterText(d.count);
     revealCounter();
   }).catch(revealCounter);
@@ -301,7 +305,6 @@
     btn.disabled = true;
     btn.textContent = 'JOINING…';
     msg.textContent = '';
-    var src = new URLSearchParams(location.search).get('src');
     fetch(API, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
