@@ -4,12 +4,20 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Win Your Morning</title>
-<link rel="canonical" href="https://kurogboun.github.io/win-your-morning/">
-<meta http-equiv="refresh" content="0; url=./win-your-morning/">
-<script>location.replace('./win-your-morning/' + location.search + location.hash);</script>
+<!-- The site moved to its own domain (2026-08-18). This repo deliberately stays
+     put rather than taking the custom domain itself: it serves
+     /.well-known/apple-app-site-association for the SHIPPED app's
+     `applinks:kurogboun.github.io` entitlement, and a custom domain here would
+     301 that file - which iOS does not follow when validating Universal Links -
+     breaking every https://kurogboun.github.io/join/<code> invite already sitting
+     in people's messages. So only the human-facing pages redirect: /join/* still
+     falls through to 404.html, and the AASA file is still served straight. -->
+<link rel="canonical" href="https://winurmorning.com/">
+<meta http-equiv="refresh" content="0; url=https://winurmorning.com/">
+<script>location.replace('https://winurmorning.com/' + location.search + location.hash);</script>
 <style>html,body{height:100%;margin:0}body{font-family:-apple-system,'SF Pro Text',system-ui,sans-serif;background:#4C86C6;color:#F4ECD8;display:grid;place-items:center}a{color:#F4ECD8}</style>
 </head>
 <body>
-<p>Redirecting to <a href="./win-your-morning/">Win Your Morning</a>…</p>
+<p>Redirecting to <a href="https://winurmorning.com/">winurmorning.com</a>…</p>
 </body>
 </html>
